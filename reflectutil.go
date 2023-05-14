@@ -10,9 +10,18 @@ import (
 // main entry point
 
 func GetDescription(input interface{}) (*StructDescription, error) {
-	d, err := getDescription(input)
+	d, err := getDescriptionFromType(reflect.TypeOf(input))
 	if err != nil {
 		return nil, fmt.Errorf("reflectutil.GetDescription: could not get description: %w", err)
+	}
+
+	return d, nil
+}
+
+func GetDescriptionFromType(typ reflect.Type) (*StructDescription, error) {
+	d, err := getDescriptionFromType(typ)
+	if err != nil {
+		return nil, fmt.Errorf("reflectutil.GetDescriptionFromType: could not get description: %w", err)
 	}
 
 	return d, nil
@@ -240,20 +249,18 @@ func (l ParameterList) Has(name string) bool {
 
 // struct tag parser
 
-func getDescription(input interface{}) (*StructDescription, error) {
-	typ := reflect.TypeOf(input)
-
+func getDescriptionFromType(typ reflect.Type) (*StructDescription, error) {
 	if typ.Kind() == reflect.Ptr {
 		typ = typ.Elem()
 	}
 
 	if typ.Kind() != reflect.Struct {
-		return nil, fmt.Errorf("reflectutil.getDescription: input should be struct or pointer to struct")
+		return nil, fmt.Errorf("reflectutil.getDescriptionFromType: input should be struct or pointer to struct")
 	}
 
 	fields, err := getFields(typ)
 	if err != nil {
-		return nil, fmt.Errorf("reflectutil.getDescription: could not get field descriptions: %w", err)
+		return nil, fmt.Errorf("reflectutil.getDescriptionFromType: could not get field descriptions: %w", err)
 	}
 
 	return &StructDescription{

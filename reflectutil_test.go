@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var describeStructTestCases = []struct {
+var getDescriptionTestCases = []struct {
 	name   string
 	get    func() interface{}
 	result *StructDescription
@@ -116,7 +116,7 @@ var describeStructTestCases = []struct {
 }
 
 func TestGetDescription(t *testing.T) {
-	for _, tc := range describeStructTestCases {
+	for _, tc := range getDescriptionTestCases {
 		t.Run(tc.name, func(t *testing.T) {
 			a := assert.New(t)
 
@@ -141,11 +141,47 @@ func TestGetDescription(t *testing.T) {
 }
 
 func BenchmarkGetDescription(b *testing.B) {
-	for _, tc := range describeStructTestCases {
+	for _, tc := range getDescriptionTestCases {
 		b.Run(tc.name, func(b *testing.B) {
 			v := tc.get()
 			for i := 0; i < b.N; i++ {
 				GetDescription(v)
+			}
+		})
+	}
+}
+
+func TestGetDescriptionFromType(t *testing.T) {
+	for _, tc := range getDescriptionTestCases {
+		t.Run(tc.name, func(t *testing.T) {
+			a := assert.New(t)
+
+			d, err := GetDescriptionFromType(reflect.TypeOf(tc.get()))
+
+			if tc.result == nil {
+				a.Nil(d)
+			} else {
+				if a.NotNil(d) {
+					a.Equal(tc.result.name, d.Name())
+					a.Equal(tc.result.fields, d.Fields())
+				}
+			}
+
+			if tc.error != "" {
+				a.ErrorContains(err, tc.error)
+			} else {
+				a.NoError(err)
+			}
+		})
+	}
+}
+
+func BenchmarkGetDescriptionFromType(b *testing.B) {
+	for _, tc := range getDescriptionTestCases {
+		b.Run(tc.name, func(b *testing.B) {
+			v := reflect.TypeOf(tc.get())
+			for i := 0; i < b.N; i++ {
+				GetDescriptionFromType(v)
 			}
 		})
 	}
