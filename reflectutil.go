@@ -35,7 +35,7 @@ type StructDescription struct {
 	fields FieldList
 }
 
-func (s StructDescription) Name() string        { return s.name }
+func (s *StructDescription) Name() string       { return s.name }
 func (s *StructDescription) Type() reflect.Type { return s.typ }
 func (s *StructDescription) Fields() FieldList  { return s.fields }
 
@@ -44,12 +44,14 @@ func (s *StructDescription) Field(name string) *Field { return s.fields.Get(name
 // field
 
 type Field struct {
-	name string
-	typ  reflect.Type
-	tags TagList
+	name  string
+	index []int
+	typ   reflect.Type
+	tags  TagList
 }
 
-func (f Field) Name() string        { return f.name }
+func (f *Field) Name() string       { return f.name }
+func (f *Field) Index() []int       { return f.index }
 func (f *Field) Type() reflect.Type { return f.typ }
 func (f *Field) Tags() TagList      { return f.tags }
 
@@ -159,7 +161,7 @@ type Tag struct {
 	parameters ParameterList
 }
 
-func (t Tag) Name() string               { return t.name }
+func (t *Tag) Name() string              { return t.name }
 func (t *Tag) Value() string             { return t.value }
 func (t *Tag) Parameters() ParameterList { return t.parameters }
 
@@ -214,7 +216,7 @@ type Parameter struct {
 	value string
 }
 
-func (p Parameter) Name() string   { return p.name }
+func (p *Parameter) Name() string  { return p.name }
 func (p *Parameter) Value() string { return p.value }
 
 // parameter list
@@ -284,9 +286,10 @@ func getFields(typ reflect.Type) (FieldList, error) {
 		}
 
 		fields = append(fields, Field{
-			name: structField.Name,
-			typ:  structField.Type,
-			tags: tags,
+			name:  structField.Name,
+			index: structField.Index,
+			typ:   structField.Type,
+			tags:  tags,
 		})
 	}
 

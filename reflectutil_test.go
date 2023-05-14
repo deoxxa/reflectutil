@@ -43,7 +43,7 @@ var getDescriptionTestCases = []struct {
 			return S{}
 		},
 		result: &StructDescription{name: "S", fields: FieldList{
-			{name: "A", typ: reflect.TypeOf(""), tags: []Tag{}},
+			{name: "A", index: []int{0}, typ: reflect.TypeOf(""), tags: []Tag{}},
 		}},
 	},
 	{
@@ -53,8 +53,8 @@ var getDescriptionTestCases = []struct {
 			return S{}
 		},
 		result: &StructDescription{name: "S", fields: FieldList{
-			{name: "A", typ: reflect.TypeOf(""), tags: []Tag{}},
-			{name: "B", typ: reflect.TypeOf(""), tags: []Tag{}},
+			{name: "A", index: []int{0}, typ: reflect.TypeOf(""), tags: []Tag{}},
+			{name: "B", index: []int{1}, typ: reflect.TypeOf(""), tags: []Tag{}},
 		}},
 	},
 	{
@@ -67,11 +67,11 @@ var getDescriptionTestCases = []struct {
 			return S{}
 		},
 		result: &StructDescription{name: "S", fields: FieldList{
-			{name: "F1", typ: reflect.TypeOf(""), tags: []Tag{
+			{name: "F1", index: []int{0}, typ: reflect.TypeOf(""), tags: []Tag{
 				{"t1", "v1", ParameterList{{"p1", ""}, {"p2k", "p2v"}}},
 				{"t2", "", ParameterList{{"p3", ""}, {"p4k", "p4v"}}},
 			}},
-			{name: "F2", typ: reflect.TypeOf(""), tags: []Tag{
+			{name: "F2", index: []int{1}, typ: reflect.TypeOf(""), tags: []Tag{
 				{"t1", "v1", ParameterList{{"p1", ""}, {"p2k", "p2v"}}},
 				{"t2", "", ParameterList{{"p3", ""}, {"p4k", "p4v"}}},
 			}},
@@ -87,10 +87,10 @@ var getDescriptionTestCases = []struct {
 			return S{}
 		},
 		result: &StructDescription{name: "S", fields: FieldList{
-			{name: "ID", typ: reflect.TypeOf(int(1)), tags: []Tag{
+			{name: "ID", index: []int{0}, typ: reflect.TypeOf(int(1)), tags: []Tag{
 				{"sql", "id", ParameterList{{"table", "t"}}},
 			}},
-			{name: "Name", typ: reflect.TypeOf(""), tags: []Tag{
+			{name: "Name", index: []int{1}, typ: reflect.TypeOf(""), tags: []Tag{
 				{"sql", "name", ParameterList{}},
 			}},
 		}},
@@ -105,10 +105,10 @@ var getDescriptionTestCases = []struct {
 			return S{}
 		},
 		result: &StructDescription{name: "S", fields: FieldList{
-			{name: "ID", typ: reflect.TypeOf(int(1)), tags: []Tag{
+			{name: "ID", index: []int{0}, typ: reflect.TypeOf(int(1)), tags: []Tag{
 				{"json", "id", ParameterList{}},
 			}},
-			{name: "Name", typ: reflect.TypeOf(""), tags: []Tag{
+			{name: "Name", index: []int{1}, typ: reflect.TypeOf(""), tags: []Tag{
 				{"json", "name", ParameterList{{"omitempty", ""}}},
 			}},
 		}},
@@ -563,7 +563,7 @@ func TestAccessors(t *testing.T) {
 	t.Run("StructDescription.Field", func(t *testing.T) {
 		a, d := get(t)
 
-		a.Equal(&Field{"Populated", reflect.TypeOf(""), []Tag{
+		a.Equal(&Field{name: "Populated", index: []int{0}, typ: reflect.TypeOf(""), tags: []Tag{
 			{"sql", "populated", ParameterList{{"table", "t"}}},
 			{"json", "populated", ParameterList{{"omitempty", ""}}},
 		}}, d.Field("Populated"))
